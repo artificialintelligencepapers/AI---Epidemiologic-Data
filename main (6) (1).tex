@@ -1,0 +1,107 @@
+% main.tex – Overleaf-ready file containing all mathematical equations referenced in
+% “Predicting Antibiotic Resistance in *Neisseria gonorrhoeae* Clinical Isolates Using Machine‑ and Deep‑Learning”
+
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{geometry}
+\geometry{margin=1in}
+\usepackage{siunitx}
+\usepackage{bm}
+
+\title{Equation Appendix}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Notation}
+\begin{itemize}
+  \item $\mathrm{TP},\;\mathrm{FP},\;\mathrm{TN},\;\mathrm{FN}$ – true/false positive/negative counts.
+  \item $N = \mathrm{TP}+\mathrm{FP}+\mathrm{TN}+\mathrm{FN}$ – total number of instances.
+  \item $y_i\in\{0,1\}$ – ground‑truth label for instance $i$.
+  \item $\hat{p}_i \in [0,1]$ – model‑predicted probability of class~1.
+\end{itemize}
+
+\section{Binary Classification Metrics}
+\subsection{Accuracy, Precision, Recall}
+\begin{align}
+  \text{Accuracy (ACC)} &= \frac{\mathrm{TP}+\mathrm{TN}}{N}, \\[4pt]
+  \text{Precision (P)} &= \frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FP}}, \\[4pt]
+  \text{Recall (R)} &= \frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}}. 
+\end{align}
+
+\subsection{F\textsubscript{1}‑score}
+\begin{equation}
+  \text{F}_{1} \,=\, 2\,\frac{\text{P}\,\cdot\,\text{R}}{\text{P}+\text{R}}.
+\end{equation}
+
+\subsection{Matthews Correlation Coefficient (MCC)}
+\begin{equation}
+  \text{MCC} = \frac{\mathrm{TP}\,\mathrm{TN} - \mathrm{FP}\,\mathrm{FN}}{\sqrt{(\mathrm{TP}+\mathrm{FP})(\mathrm{TP}+\mathrm{FN})(\mathrm{TN}+\mathrm{FP})(\mathrm{TN}+\mathrm{FN})}}.
+\end{equation}
+
+\subsection{Area Under the ROC Curve (AUC)}
+The threshold‑independent metric
+\begin{equation}
+ \text{AUC} = \int_{0}^{1} \text{TPR}(\text{FPR})\,\mathrm d(\text{FPR}),
+\end{equation}
+where $\text{TPR}=\mathrm{TP}/(\mathrm{TP}+\mathrm{FN})$ and $\text{FPR}=\mathrm{FP}/(\mathrm{FP}+\mathrm{TN})$.
+
+\section{Loss Functions}
+\subsection{Binary Cross‑Entropy (Neural Network)}
+\begin{equation}
+  \mathcal{L}_{\text{BCE}} = -\frac{1}{N}\sum_{i=1}^{N}\bigl[y_i\,\log \hat{p}_i + (1-y_i)\,\log(1-\hat{p}_i)\bigr].
+\end{equation}
+
+\subsection{CatBoost Ordered Boosting Objective}
+CatBoost minimises the additive loss
+\begin{equation}
+  \min_{f \in \mathcal{F}} \; \sum_{i=1}^{N} \ell\bigl(y_i, f\bigl(\bm{x}_i\bigr)\bigr) + \lambda\,\|f\|_{\text{model}}^{2},
+\end{equation}
+where $\ell$ is the log‑loss, $\|\cdot\|_{\text{model}}$ the model‑specific regulariser and $\lambda>0$ the L2 term tuned over $[1,10]$.
+
+\section{Log\textsubscript{2} MIC Transformation}
+\begin{equation}
+  \mathrm{log2\_mic} = \log_{2}\bigl(\text{MIC}\,/\,\si{\milli\gram\per\litre}\bigr).
+\end{equation}
+
+\section{Bootstrapped Confidence Intervals}
+For an estimator $\hat{\theta}$ and $B$ bootstrap resamples $\{\hat{\theta}^{*(b)}\}_{b=1}^{B}$:
+\begin{equation}
+  \text{CI}_{95\%} = \bigl[\,\hat{\theta}^{*(0.025)},\;\hat{\theta}^{*(0.975)}\,\bigr].
+\end{equation}
+
+\section{DeLong Test for Paired ROC Curves}
+Given two vectors of AUC contributions $V_1$ and $V_2$:
+\begin{align}
+  \Delta &= \text{AUC}_1 - \text{AUC}_2,\\[4pt]
+  \sigma^{2}_{\Delta} &= \frac{\mathrm{Var}(V_1 - V_2)}{N},\\[4pt]
+  z &= \frac{\Delta}{\sigma_{\Delta}}, \qquad p = 2\bigl(1-\Phi(|z|)\bigr),
+\end{align}
+where $\Phi(\cdot)$ is the standard normal CDF.
+
+\section{Feed‑Forward Neural Network Forward Pass}
+\begin{align}
+  \bm{h}_1 &= \text{ReLU}\bigl(\bm{W}_1 \bm{x} + \bm{b}_1\bigr),\\[4pt]
+  \bm{h}_2 &= \text{ReLU}\bigl(\bm{W}_2 \bm{h}_1 + \bm{b}_2\bigr),\\[4pt]
+  \hat{y} &= \sigma\bigl(\bm{w}_3^{\top} \bm{h}_2 + b_3\bigr),
+\end{align}
+with $\sigma(z)=1/(1+e^{-z})$.
+
+\section{Bayesian Optimisation Search Space}
+\begin{align}
+  \text{depth} &\sim \mathcal{U}\{4,\,10\},\\[4pt]
+  \eta\, (\text{learning rate}) &\sim \mathcal{U}(0.005,\,0.3),\\[4pt]
+  \lambda_{\text{L2}} &\sim \mathcal{U}(1,\,10).
+\end{align}
+
+\section{Stratified $k$‑Fold Cross‑Validation}
+Let $\mathcal{D}=\{(\bm{x}_i,y_i)\}_{i=1}^{N}$ and strata $S_1,\ldots,S_K$ with class proportions preserved; then
+\begin{equation}
+  \text{CV}(\theta) = \frac{1}{K}\sum_{k=1}^{K} \mathcal{M}\bigl(\theta;\,\mathcal{D}_{\text{train}}^{(k)},\mathcal{D}_{\text{test}}^{(k)}\bigr),
+\end{equation}
+where $\mathcal{M}$ is a chosen metric (e.g.~AUC).
+
+\section*{End of Appendix}
+\end{document}
